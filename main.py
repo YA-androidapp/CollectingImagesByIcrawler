@@ -30,8 +30,8 @@ def main():
             dpath = os.path.join(IMAGEDIRPATH, dname)
             os.makedirs(dpath, exist_ok=True)
 
-            # crawler = GoogleImageCrawler(storage={'root_dir': dpath})
-            # crawler.crawl(keyword=keyword, max_num=100)
+            crawler = GoogleImageCrawler(storage={'root_dir': dpath})
+            crawler.crawl(keyword=keyword, max_num=200)
 
 
 if __name__ == '__main__':
