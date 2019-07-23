@@ -9,6 +9,7 @@ from icrawler.builtin import GoogleImageCrawler
 import cv2
 import datetime
 import glob
+import imghdr
 import os
 import re
 
@@ -54,34 +55,44 @@ def collect():
 
 
 def filter():
-    faceCascadeClassifier = cv2.CascadeClassifier(HAARCASCADE_PATH)
-
     dirs = glob.glob(os.path.join(IMAGEDIRPATH, '**' + os.sep), recursive=True)
     # print(dirs) # ['images/', 'images/AAA/', 'images/BBB/', 'images/CCC/', 'images/DDD/', 'images/EEE/']
     for dir in dirs:
         if os.path.basename(os.path.dirname(dir)) == os.path.basename(os.path.dirname(IMAGEDIRPATH)):
             continue
-        subdir = os.path.basename(os.path.dirname(dir))
-        print('subdir: ' + subdir)
+        actress = os.path.basename(os.path.dirname(dir))
+        print('actress: ' + actress)
 
         # 出力先
-        mvdir = os.path.join(FACEIMAGEDIRPATH, subdir)
+        mvdir = os.path.join(FACEIMAGEDIRPATH, actress)
         os.makedirs(mvdir, exist_ok=True)
 
         # 移動し得るファイルを検索
         files = glob.glob(os.path.join(dir, '?*.???*'), recursive=True) # 拡張子3文字以上のファイル
         # print(files) # ['images/EEE/000001.jpg', 'images/EEE/000002.jpg', 'images/EEE/000003.jpg', 'images/EEE/000173.jpg']]
         for file in files:
-            #TODO: ファイル内容が画像か判定
-            detectFace(file)
+            if imghdr.what(file) is not None: # 画像ファイルか判定
+                detectFace(file)
 
 
 def detectFace(file):
-    # TODO: Haar cascadeを使用して、顔領域を切り出して結果出力用ディレクトリに保存する
-    pass
+    src = cv2.imread(file)
+    src_gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+    faces = faceCascadeClassifier.detectMultiScale(src_gray)
+    for x, y, w, h in faces:
+        face = src[y: y + h, x: x + w]
+
+        actress = os.path.basename(os.path.dirname(file))
+        mvdir = os.path.join(FACEIMAGEDIRPATH, actress)
+        filesplt = os.path.splitext(os.path.basename(file))
+        facefile = os.path.join(mvdir, filesplt[0] + '_{:04}-{:04}-{:04}-{:04}'.format(y, y + h, x, x + w) + filesplt[1])
+        print('facefile: ' + facefile)
+        cv2.imwrite(facefile, face)
 
 
 if __name__ == '__main__':
     # checkDir()
     # collect()
+
+    faceCascadeClassifier = cv2.CascadeClassifier(HAARCASCADE_PATH)
     filter()
