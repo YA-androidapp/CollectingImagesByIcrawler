@@ -91,8 +91,8 @@ def detectFace(file):
 
 
 if __name__ == '__main__':
-    # checkDir()
-    # collect()
+    checkDir()
+    collect()
 
     faceCascadeClassifier = cv2.CascadeClassifier(HAARCASCADE_PATH)
     filter()
