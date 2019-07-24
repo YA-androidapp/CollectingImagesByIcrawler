@@ -18,6 +18,8 @@ DATAFILEPATH = 'q.txt'
 IMAGEDIRPATH = 'images'
 FACEIMAGEDIRPATH = 'images_face'
 
+MAX_IMAGES_PER_PERSON = 100
+
 
 HAARCASCADE_PATH = 'sources/data/haarcascades/haarcascade_frontalface_default.xml'
 
@@ -42,16 +44,18 @@ def checkDir():
 
 def collect():
     with open(DATAFILEPATH) as f:
+        i = 0
         for line in f:
-            keyword = line.strip().replace(' ', '').replace('　', '')
-            print(keyword)
-
-            dname = re.sub(r'[\\|/|:|?|.|\'|<|>|\|]', '-', keyword)
+            keyword = re.sub(r'[\\|/|:|?|.|\'|<|>|\|]', '-', line.strip().replace(' ', '').replace('　', ''))
+            dname = '{:03}_{}'.format(i, keyword)
+            print(dname)
             dpath = os.path.join(IMAGEDIRPATH, dname)
             os.makedirs(dpath, exist_ok=True)
 
             crawler = GoogleImageCrawler(storage={'root_dir': dpath})
-            crawler.crawl(keyword=keyword, max_num=200)
+            crawler.crawl(keyword=keyword, max_num=MAX_IMAGES_PER_PERSON)
+
+            i += 1
 
 
 def filter():
