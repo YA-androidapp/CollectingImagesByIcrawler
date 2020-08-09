@@ -159,8 +159,8 @@ if __name__ == '__main__':
     try:
         sys.stdout = open(LOGFILEPATH, 'a', encoding='utf-8')
 
-        # checkDir()
-        # collect()
+        checkDir()
+        collect()
 
         faceCascadeClassifier = cv2.CascadeClassifier(HAARCASCADE_PATH)
         filter()
